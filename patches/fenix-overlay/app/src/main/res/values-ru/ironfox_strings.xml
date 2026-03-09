@@ -78,4 +78,6 @@
     <string name="wallpaper_collection_fennec_description">Обои из Fennec F-Droid. %s</string>
     <string name="onboarding_if_preference_doh_off_summary" translatable="false"></string>
     <string name="if_title" translatable="false"></string>
+    <string name="wallpaper_collection_fennec" translatable="false"></string>
+    <string name="preference_oled_theme" translatable="false"></string>
 </resources>
