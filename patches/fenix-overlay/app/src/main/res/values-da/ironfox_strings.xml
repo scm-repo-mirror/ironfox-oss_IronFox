@@ -63,21 +63,4 @@
     <string name="onboarding_state_installing_ublock_error">Der opstod en fejl under installationen af uBlock Origin: %1$s</string>
     <string name="onboarding_action_retry">Prøv igen</string>
     <string name="preference_collections_enabled">Aktivér indsamling</string>
-    <string name="preference_referer_policy"></string>
-    <string name="onboarding_if_preference_doh_off_summary" translatable="false"></string>
-    <string name="preference_referer_policy_always"></string>
-    <string name="wallpaper_collection_fennec" translatable="false"></string>
-    <string name="preference_fpp_overrides_mozilla_enabled"></string>
-    <string name="preference_autoplay_policy_click_to_play"></string>
-    <string name="if_title" translatable="false"></string>
-    <string name="preference_referer_policy_base_domains_match"></string>
-    <string name="preference_fpp_overrides_ironfox_summary"></string>
-    <string name="preference_autoplay_policy_transient"></string>
-    <string name="preference_print_enabled"></string>
-    <string name="preference_referer_policy_summary"></string>
-    <string name="preference_autoplay_policy_sticky"></string>
-    <string name="preference_oled_theme" translatable="false"></string>
-    <string name="preference_fpp_overrides_mozilla_summary"></string>
-    <string name="preference_fpp_overrides_ironfox_enabled"></string>
-    <string name="preference_referer_policy_hosts_match"></string>
 </resources>

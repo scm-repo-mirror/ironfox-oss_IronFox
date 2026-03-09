@@ -55,29 +55,4 @@
     <string name="onboarding_action_retry">Yritä uudelleen</string>
     <string name="preference_translations_enabled">Laita Firefox käännökset päälle</string>
     <string name="preference_always_use_private_browsing">Käytä aina yksityinen-selaus tilaa</string>
-    <string name="onboarding_if_preference_doh_off_summary" translatable="false"></string>
-    <string name="preference_fpp_overrides_ironfox_timezone_enabled"></string>
-    <string name="wallpaper_collection_fennec" translatable="false"></string>
-    <string name="spoof_timezone"></string>
-    <string name="preference_fpp_overrides_mozilla_enabled"></string>
-    <string name="preference_fpp_overrides_ironfox_webgl_summary"></string>
-    <string name="preference_autoplay_policy_click_to_play"></string>
-    <string name="preference_fpp_overrides_ironfox_webgl_enabled"></string>
-    <string name="if_title" translatable="false"></string>
-    <string name="preference_media_autoplay_description"></string>
-    <string name="preference_fpp_overrides_ironfox_summary"></string>
-    <string name="preference_webgl_disabled"></string>
-    <string name="preference_jit_trusted_principals_enabled_summary"></string>
-    <string name="preference_media_autoplay_title"></string>
-    <string name="preference_autoplay_policy_transient"></string>
-    <string name="wallpaper_collection_fennec_description"></string>
-    <string name="preference_autoplay_policy_sticky"></string>
-    <string name="preference_collections_enabled"></string>
-    <string name="preference_jit_trusted_principals_enabled"></string>
-    <string name="preference_oled_theme" translatable="false"></string>
-    <string name="spoof_timezone_summary"></string>
-    <string name="extension_failed_to_install_xpinstall_disabled_error"></string>
-    <string name="preference_fpp_overrides_mozilla_summary"></string>
-    <string name="preference_fpp_overrides_ironfox_timezone_summary"></string>
-    <string name="preference_fpp_overrides_ironfox_enabled"></string>
 </resources>

@@ -76,8 +76,4 @@
     <string name="preference_autoplay_policy_click_to_play">Oynatmak için tıkla</string>
     <string name="preference_always_use_private_browsing">Her zaman gizli tarama modunu kullan</string>
     <string name="wallpaper_collection_fennec_description">Fennec F-Droid\'den arka planlar. %s</string>
-    <string name="onboarding_if_preference_doh_off_summary" translatable="false"></string>
-    <string name="if_title" translatable="false"></string>
-    <string name="wallpaper_collection_fennec" translatable="false"></string>
-    <string name="preference_oled_theme" translatable="false"></string>
 </resources>

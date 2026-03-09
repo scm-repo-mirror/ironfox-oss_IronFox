@@ -76,8 +76,4 @@
     <string name="preference_autoplay_policy_transient">允许在与页面快速交互后使用（默认值）</string>
     <string name="preference_always_use_private_browsing">始终使用隐私浏览模式</string>
     <string name="wallpaper_collection_fennec_description">来自 Fennec F-Droid 的壁纸。%s</string>
-    <string name="onboarding_if_preference_doh_off_summary" translatable="false"></string>
-    <string name="if_title" translatable="false"></string>
-    <string name="wallpaper_collection_fennec" translatable="false"></string>
-    <string name="preference_oled_theme" translatable="false"></string>
 </resources>

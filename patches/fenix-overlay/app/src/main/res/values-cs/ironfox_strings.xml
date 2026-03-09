@@ -76,8 +76,4 @@
     <string name="preference_autoplay_policy_click_to_play">Kliknutí pro přehrání</string>
     <string name="preference_always_use_private_browsing">Vždy použít režim anonymního prohlížení</string>
     <string name="wallpaper_collection_fennec_description">Pozadí z projektu Fennec F-Droid. %s</string>
-    <string name="onboarding_if_preference_doh_off_summary" translatable="false"></string>
-    <string name="wallpaper_collection_fennec" translatable="false"></string>
-    <string name="if_title" translatable="false"></string>
-    <string name="preference_oled_theme" translatable="false"></string>
 </resources>
