@@ -53,4 +53,6 @@
     <string name="onboarding_state_installing_ublock">A instalar o uBlock Origin…</string>
     <string name="onboarding_state_installing_ublock_error">Ocorreu um erro ao instalar o uBlock Origin: %1$s</string>
     <string name="onboarding_action_retry">Tentar novamente</string>
+    <string name="onboarding_if_preference_doh_off_summary" translatable="false"></string>
+    <string name="if_title" translatable="false"></string>
 </resources>
