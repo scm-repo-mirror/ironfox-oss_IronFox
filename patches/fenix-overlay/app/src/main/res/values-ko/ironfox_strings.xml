@@ -76,4 +76,8 @@
     <string name="preference_referer_policy_hosts_match">교차 출처 리퍼러 비활성화</string>
     <string name="restart_required_summary">이 설정을 변경하면 브라우저가 재시작됩니다</string>
     <string name="if_preferences_secret">숨겨진 설정</string>
+    <string name="onboarding_if_preference_doh_off_summary" translatable="false"></string>
+    <string name="wallpaper_collection_fennec" translatable="false"></string>
+    <string name="if_title" translatable="false"></string>
+    <string name="preference_oled_theme" translatable="false"></string>
 </resources>
