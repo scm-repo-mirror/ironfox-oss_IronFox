@@ -83,4 +83,6 @@
     <string name="preference_always_use_private_browsing">Sempre usar o modo de navegação privativa</string>
     <string name="wallpaper_collection_fennec_description">Planos de fundo do Fennec F-Droid. %s</string>
     <string name="onboarding_if_preference_doh_off_summary" translatable="false"></string>
+    <string name="wallpaper_collection_fennec" translatable="false"></string>
+    <string name="preference_oled_theme" translatable="false"></string>
 </resources>
