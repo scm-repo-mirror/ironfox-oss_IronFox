@@ -76,4 +76,8 @@
     <string name="preference_autoplay_policy_click_to_play">Clic-para-reproducir</string>
     <string name="preference_always_use_private_browsing">Usar siempre modo de navegación privada</string>
     <string name="wallpaper_collection_fennec_description">Wallpaper proveniente de Fennec F-Driod. %s</string>
+    <string name="onboarding_if_preference_doh_off_summary" translatable="false"></string>
+    <string name="wallpaper_collection_fennec" translatable="false"></string>
+    <string name="if_title" translatable="false"></string>
+    <string name="preference_oled_theme" translatable="false"></string>
 </resources>
