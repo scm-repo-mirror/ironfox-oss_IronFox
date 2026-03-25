@@ -218,7 +218,7 @@ IRONFOX_BUNDLETOOL_DIR_DEFAULT="${IRONFOX_EXTERNAL}/bundletool"
 if [[ -z "${IRONFOX_BUNDLETOOl_DIR+x}" ]]; then
     export IRONFOX_BUNDLETOOL_DIR="${IRONFOX_BUNDLETOOL_DIR_DEFAULT}"
 fi
-export IRONFOX_BUNDLETOOL="${IRONFOX_BUNDLETOOL_DIR}/bundletool"
+export IRONFOX_BUNDLETOOL="${IRONFOX_SCRIPTS}/bundletool.sh"
 export IRONFOX_BUNDLETOOL_JAR="${IRONFOX_BUNDLETOOL_DIR}/bundletool.jar"
 
 # cbindgen
@@ -339,7 +339,8 @@ IRONFOX_GRADLE_DIR_DEFAULT="${IRONFOX_EXTERNAL}/gradle"
 if [[ -z "${IRONFOX_GRADLE_DIR+x}" ]]; then
     export IRONFOX_GRADLE_DIR="${IRONFOX_GRADLE_DIR_DEFAULT}"
 fi
-export IRONFOX_GRADLE="${IRONFOX_GRADLE_DIR}/gradle"
+export IRONFOX_GRADLE="${IRONFOX_SCRIPTS}/gradle.sh"
+export IRONFOX_GRADLE_PY="${IRONFOX_GRADLE_DIR}/gradlew.py"
 
 ## Gradle cache
 IRONFOX_GRADLE_CACHE_DEFAULT="${IRONFOX_BUILD}/gradle/cache"
@@ -374,6 +375,7 @@ fi
 if [[ -z "${IRONFOX_JAVA_HOME+x}" ]]; then
     export IRONFOX_JAVA_HOME="${IRONFOX_JAVA_HOME_DEFAULT}"
 fi
+export IRONFOX_JAVA="${IRONFOX_JAVA_HOME}/bin/java"
 
 # libclang
 if [[ "${IRONFOX_OS}" == 'osx' ]]; then
@@ -419,6 +421,19 @@ if [[ -z "${IRONFOX_PREBUILDS+x}" ]]; then
     export IRONFOX_PREBUILDS="${IRONFOX_PREBUILDS_DEFAULT}"
 fi
 
+# npm cache
+IRONFOX_NPM_CACHE_DEFAULT="${IRONFOX_BUILD}/.npm"
+if [[ -z "${IRONFOX_NPM_CACHE+x}" ]]; then
+    export IRONFOX_NPM_CACHE="${IRONFOX_NPM_CACHE_DEFAULT}"
+fi
+
+# nvm
+IRONFOX_NVM_DEFAULT="${IRONFOX_EXTERNAL}/nvm"
+if [[ -z "${IRONFOX_NVM+x}" ]]; then
+    export IRONFOX_NVM="${IRONFOX_NVM_DEFAULT}"
+fi
+export IRONFOX_NVM_ENV="${IRONFOX_NVM}/nvm.sh"
+
 # Phoenix
 IRONFOX_PHOENIX_DEFAULT="${IRONFOX_EXTERNAL}/phoenix"
 if [[ -z "${IRONFOX_PHOENIX+x}" ]]; then
@@ -431,8 +446,15 @@ if [[ -z "${IRONFOX_PIP+x}" ]]; then
     export IRONFOX_PIP="${IRONFOX_PIP_DEFAULT}"
 fi
 
-# Python (Glean)
-export IRONFOX_GLEAN_PIP_ENV="${IRONFOX_GRADLE_HOME}/glean"
+# Python
+if [[ "${IRONFOX_OS}" == 'osx' ]]; then
+    IRONFOX_PYTHON_DEFAULT='/opt/homebrew/bin/python'
+else
+    IRONFOX_PYTHON_DEFAULT='/usr/bin/python'
+fi
+if [[ -z "${IRONFOX_PYTHON+x}" ]]; then
+    export IRONFOX_PYTHON="${IRONFOX_PYTHON_DEFAULT}"
+fi
 
 # Python (pip) environment
 IRONFOX_PIP_DIR_DEFAULT="${IRONFOX_BUILD}/pyenv"
@@ -441,10 +463,8 @@ if [[ -z "${IRONFOX_PIP_DIR+x}" ]]; then
 fi
 export IRONFOX_PIP_ENV="${IRONFOX_PIP_DIR}/bin/activate"
 
-## For macOS, ensure that Python 3.9 is in PATH
-if [[ "${IRONFOX_OS}" == 'osx' ]]; then
-    export PATH="${PATH}:$(brew --prefix)/opt/python@3.9/Frameworks/Python.framework/Versions/3.9/bin"
-fi
+## Python (pip) environment - Glean
+export IRONFOX_GLEAN_PIP_ENV="${IRONFOX_GRADLE_HOME}/glean"
 
 # Rust (cargo)
 IRONFOX_CARGO_HOME_DEFAULT="${IRONFOX_BUILD}/.cargo"
@@ -556,6 +576,25 @@ elif [[ "${IRONFOX_GRADLE_FLAGS_OVERRIDE}" == 1 ]]; then
     export IRONFOX_GRADLE_FLAGS="${IRONFOX_GRADLE_FLAGS}"
 else
     export IRONFOX_GRADLE_FLAGS="${IRONFOX_GRADLE_FLAGS_DEFAULT} ${IRONFOX_GRADLE_FLAGS}"
+fi
+
+# If Node.js options are added, this determines whether they should be appended to our default flags (default),
+## or if they should override them entirely
+IRONFOX_NODE_OPTIONS_OVERRIDE_DEFAULT=0
+if [[ -z "${IRONFOX_NODE_OPTIONS_OVERRIDE+x}" ]]; then
+    export IRONFOX_NODE_OPTIONS_OVERRIDE="${IRONFOX_NODE_OPTIONS_OVERRIDE_DEFAULT}"
+fi
+
+# Node.js options
+### https://nodejs.org/api/cli.html#node-optionsoptions
+IRONFOX_NODE_OPTIONS_DEFAULT='--jitless --tls-min-v1.2 --use-bundled-ca'
+if [[ -z "${IRONFOX_NODE_OPTIONS+x}" ]]; then
+    export IRONFOX_NODE_OPTIONS_OVERRIDE=1
+    export IRONFOX_NODE_OPTIONS="${IRONFOX_NODE_OPTIONS_DEFAULT}"
+elif [[ "${IRONFOX_NODE_OPTIONS_OVERRIDE}" == 1 ]]; then
+    export IRONFOX_NODE_OPTIONS="${IRONFOX_NODE_OPTIONS}"
+else
+    export IRONFOX_NODE_OPTIONS="${IRONFOX_NODE_OPTIONS_DEFAULT} ${IRONFOX_NODE_OPTIONS}"
 fi
 
 # If Rust flags are added, this determines whether they should be appended to our default flags (default),
@@ -689,3 +728,18 @@ fi
 # Set our external environment variables
 IRONFOX_ENV_EXTERNAL="${IRONFOX_SCRIPTS}/env_external.sh"
 source "${IRONFOX_ENV_EXTERNAL}"
+
+source "${IRONFOX_VERSIONS}"
+
+# Node.js
+IRONFOX_NODEJS_DEFAULT="${IRONFOX_NVM}/versions/node/v${NODE_VERSION}/bin/node"
+if [[ -z "${IRONFOX_NODEJS+x}" ]]; then
+    export IRONFOX_NODEJS="${IRONFOX_NODEJS_DEFAULT}"
+fi
+
+# npm
+IRONFOX_NPM_DEFAULT="${IRONFOX_NVM}/versions/node/v${NODE_VERSION}/bin/npm"
+if [[ -z "${IRONFOX_NPM+x}" ]]; then
+    export IRONFOX_NPM="${IRONFOX_NPM_DEFAULT}"
+fi
+

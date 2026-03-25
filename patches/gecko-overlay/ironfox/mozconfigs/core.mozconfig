@@ -109,12 +109,8 @@ ac_add_options --disable-updater
 ### Windows-specific, but doesn't hurt to set here
 ac_add_options --disable-wmf
 
-## Do not require nimbus-fml for builds
-ac_add_options --without-nimbus-fml
-
-## Do not require Node.js for builds
+## Disable Node.js
 ac_add_options --disable-nodejs
-export NODEJS=
 
 ## Enable AutoConfig
 ### https://support.mozilla.org/kb/customizing-firefox-using-autoconfig
@@ -170,6 +166,9 @@ ac_add_options --with-java-bin-path="${IRONFOX_JAVA_HOME}/bin"
 ac_add_options --with-l10n-base="${IRONFOX_L10N_CENTRAL}"
 export L10NBASEDIR="${IRONFOX_L10N_CENTRAL}"
 
+## Set Node.js path
+export NODEJS="${IRONFOX_NODEJS}"
+
 ## Set Rust path
 export CARGO="${IRONFOX_CARGO}"
 export RUSTC="${IRONFOX_RUSTC}"
@@ -188,7 +187,6 @@ fi
 ## Skip checks for unwanted/unused API keys
 ac_add_options --without-adjust-sdk-keyfile
 ac_add_options --without-bing-api-keyfile
-ac_add_options --without-google-location-service-api-keyfile
 ac_add_options --without-mozilla-api-keyfile
 ac_add_options --without-leanplum-sdk-keyfile
 ac_add_options --without-pocket-api-keyfile

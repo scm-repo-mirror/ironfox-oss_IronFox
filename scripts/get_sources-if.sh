@@ -32,6 +32,8 @@ IRONFOX_GET_SOURCE_GLEAN_PARSER=0
 IRONFOX_GET_SOURCE_GRADLE=0
 IRONFOX_GET_SOURCE_GYP=0
 IRONFOX_GET_SOURCE_MICROG=0
+IRONFOX_GET_SOURCE_NODE=0
+IRONFOX_GET_SOURCE_NPM=0
 IRONFOX_GET_SOURCE_PHOENIX=0
 IRONFOX_GET_SOURCE_PIP=0
 IRONFOX_GET_SOURCE_PREBUILDS=0
@@ -89,6 +91,12 @@ elif [ "${target}" == 'gyp' ]; then
 elif [ "${target}" == 'microg' ]; then
     # Get microG
     IRONFOX_GET_SOURCE_MICROG=1
+elif [ "${target}" == 'node' ]; then
+    # Get + set-up Node.js
+    IRONFOX_GET_SOURCE_NODE=1
+elif [ "${target}" == 'npm' ]; then
+    # Get + set-up npm
+    IRONFOX_GET_SOURCE_NPM=1
 elif [ "${target}" == 'phoenix' ]; then
     # Get Phoenix
     IRONFOX_GET_SOURCE_PHOENIX=1
@@ -123,6 +131,8 @@ elif [ "${target}" == 'all' ]; then
     IRONFOX_GET_SOURCE_GRADLE=1
     IRONFOX_GET_SOURCE_GYP=1
     IRONFOX_GET_SOURCE_MICROG=1
+    IRONFOX_GET_SOURCE_NODE=1
+    IRONFOX_GET_SOURCE_NPM=1
     IRONFOX_GET_SOURCE_PHOENIX=1
     IRONFOX_GET_SOURCE_PIP=1
     IRONFOX_GET_SOURCE_PREBUILDS=1
@@ -148,6 +158,8 @@ else
     echo 'Gradle: gradle'
     echo 'GYP: gyp'
     echo 'microG: microg'
+    echo 'Node.js: node'
+    echo 'npm: npm'
     echo 'Phoenix: phoenix'
     echo 'pip: pip'
     echo 'Prebuilds: prebuilds'
@@ -243,6 +255,10 @@ function update_sha512sum() {
         echo_red_text 'Updating SHA512sum for Bundletool...'
         "${IRONFOX_SED}" -i -e "s|BUNDLETOOL_SHA512SUM='.*'|BUNDLETOOL_SHA512SUM='"${new_sha512sum}"'|g" "${IRONFOX_VERSIONS}"
         echo_green_text 'SUCCESS: Updated SHA512sum for Bundletool'
+    elif [ "${old_sha512sum}" == "${BUNDLETOOL_REPO_SHA512SUM}" ]; then
+        echo_red_text 'Updating SHA512sum for Bundletool (repository)...'
+        "${IRONFOX_SED}" -i -e "s|BUNDLETOOL_REPO_SHA512SUM='.*'|BUNDLETOOL_REPO_SHA512SUM='"${new_sha512sum}"'|g" "${IRONFOX_VERSIONS}"
+        echo_green_text 'SUCCESS: Updated SHA512sum for Bundletool (repository)'
     elif [ "${old_sha512sum}" == "${CBINDGEN_SHA512SUM}" ]; then
         echo_red_text 'Updating SHA512sum for cbindgen...'
         "${IRONFOX_SED}" -i -e "s|CBINDGEN_SHA512SUM='.*'|CBINDGEN_SHA512SUM='"${new_sha512sum}"'|g" "${IRONFOX_VERSIONS}"
@@ -275,6 +291,10 @@ function update_sha512sum() {
         echo_red_text 'Updating SHA512sum for firefox-l10n...'
         "${IRONFOX_SED}" -i -e "s|L10N_SHA512SUM='.*'|L10N_SHA512SUM='"${new_sha512sum}"'|g" "${IRONFOX_VERSIONS}"
         echo_green_text 'SUCCESS: Updated SHA512sum for firefox-l10n'
+    elif [ "${old_sha512sum}" == "${NVM_SHA512SUM}" ]; then
+        echo_red_text 'Updating SHA512sum for nvm...'
+        "${IRONFOX_SED}" -i -e "s|NVM_SHA512SUM='.*'|NVM_SHA512SUM='"${new_sha512sum}"'|g" "${IRONFOX_VERSIONS}"
+        echo_green_text 'SUCCESS: Updated SHA512sum for nvm'
     elif [ "${old_sha512sum}" == "${PHOENIX_SHA512SUM}" ]; then
         echo_red_text 'Updating SHA512sum for Phoenix...'
         "${IRONFOX_SED}" -i -e "s|PHOENIX_SHA512SUM='.*'|PHOENIX_SHA512SUM='"${new_sha512sum}"'|g" "${IRONFOX_VERSIONS}"
@@ -647,21 +667,16 @@ function get_as() {
 # Get + set-up Bundletool
 function get_bundletool() {
     echo_red_text 'Downloading Bundletool...'
-    download "https://github.com/google/bundletool/releases/download/${BUNDLETOOL_VERSION}/bundletool-all-${BUNDLETOOL_VERSION}.jar" "${IRONFOX_BUNDLETOOL_JAR}"
+    if [[ "${IRONFOX_NO_PREBUILDS}" == "1" ]]; then
+        download_and_extract 'bundletool' "https://github.com/google/bundletool/archive/${BUNDLETOOL_REPO_COMMIT}.tar.gz" "${IRONFOX_BUNDLETOOL_DIR}" "${BUNDLETOOL_REPO_SHA512SUM}"
+    else
+        download "https://github.com/google/bundletool/releases/download/${BUNDLETOOL_VERSION}/bundletool-all-${BUNDLETOOL_VERSION}.jar" "${IRONFOX_BUNDLETOOL_JAR}"
 
-    # Validate SHA512sum
-    validate_sha512sum "${BUNDLETOOL_SHA512SUM}" "${IRONFOX_BUNDLETOOL_JAR}"
-
-    if ! [[ -f "${IRONFOX_BUNDLETOOL}" ]]; then
-        echo_red_text 'Creating bundletool script...'
-        {
-            echo '#!/bin/bash'
-            echo "exec java -jar ${IRONFOX_BUNDLETOOL_JAR} \"\$@\""
-        } > "${IRONFOX_BUNDLETOOL}"
-        chmod +x "${IRONFOX_BUNDLETOOL}"
+        # Validate SHA512sum
+        validate_sha512sum "${BUNDLETOOL_SHA512SUM}" "${IRONFOX_BUNDLETOOL_JAR}"
     fi
 
-    echo_green_text "SUCCESS: Set-up Bundletool at ${IRONFOX_BUNDLETOOL}"
+    echo_green_text "SUCCESS: Set-up Bundletool at ${IRONFOX_BUNDLETOOL_DIR}"
 }
 
 # Get cbindgen
@@ -708,26 +723,6 @@ function get_firefox_l10n() {
     echo_red_text 'Downloading firefox-l10n...'
     download_and_extract 'l10n-central' "https://github.com/mozilla-l10n/firefox-l10n/archive/${L10N_COMMIT}.tar.gz" "${IRONFOX_L10N_CENTRAL}" "${L10N_SHA512SUM}"
     echo_green_text "SUCCESS: Set-up firefox-l10n at ${IRONFOX_L10N_CENTRAL}"
-}
-
-# Get + set-up F-Droid's Gradle script
-function get_gradle() {
-    echo_red_text "Downloading F-Droid's Gradle script..."
-    download "https://gitlab.com/fdroid/gradlew-fdroid/-/raw/${GRADLE_COMMIT}/gradlew.py" "${IRONFOX_GRADLE_DIR}/gradlew.py"
-
-    # Validate SHA512sum
-    validate_sha512sum "${GRADLE_SHA512SUM}" "${IRONFOX_GRADLE_DIR}/gradlew.py"
-
-    if ! [[ -f "${IRONFOX_GRADLE}" ]]; then
-        echo_red_text 'Creating Gradle script...'
-        {
-            echo '#!/bin/bash'
-            echo "exec python3 ${IRONFOX_GRADLE_DIR}/gradlew.py \"\$@\""
-        } > "${IRONFOX_GRADLE}"
-        chmod +x "${IRONFOX_GRADLE}"
-    fi
-
-    echo_green_text "SUCCESS: Set-up Gradle at ${IRONFOX_GRADLE}"
 }
 
 # Get Glean
@@ -778,6 +773,15 @@ function get_glean_parser() {
     validate_sha512sum "${GLEAN_PARSER_SHA512SUM}" "${IRONFOX_GLEAN_PARSER_WHEELS}/glean_parser-${GLEAN_PARSER_VERSION}-py3-none-any.whl"
 }
 
+# Get + set-up F-Droid's Gradle script
+function get_gradle() {
+    echo_red_text "Downloading F-Droid's Gradle script..."
+    download "https://gitlab.com/fdroid/gradlew-fdroid/-/raw/${GRADLE_COMMIT}/gradlew.py" "${IRONFOX_GRADLE_PY}"
+
+    # Validate SHA512sum
+    validate_sha512sum "${GRADLE_SHA512SUM}" "${IRONFOX_GRADLE_PY}"
+}
+
 # Get GYP
 function get_gyp() {
     if  [ ! -d "${IRONFOX_PIP_DIR}" ] || [ ! -f "${IRONFOX_PIP_ENV}" ]; then
@@ -819,11 +823,39 @@ function get_microg() {
     echo_green_text "SUCCESS: Set-up microG at ${IRONFOX_GMSCORE}"
 }
 
-# Get UnifiedPush-AC
-function get_up_ac() {
-    echo_red_text 'Downloading UnifiedPush-AC...'
-    download_and_extract 'unifiedpush-ac' "https://gitlab.com/ironfox-oss/unifiedpush-ac/-/archive/${UNIFIEDPUSHAC_COMMIT}/unifiedpush-ac-${UNIFIEDPUSHAC_COMMIT}.tar.gz" "${IRONFOX_UP_AC}" "${UNIFIEDPUSHAC_SHA512SUM}"
-    echo_green_text "SUCCESS: Set-up UnifiedPush-AC at ${IRONFOX_UP_AC}"
+# Get + set-up Node.js
+function get_node() {
+    if [[ -d "${IRONFOX_NVM}" ]]; then
+        echo_red_text "The Node.js environment is already set-up at ${IRONFOX_NVM}"
+        read -p "Do you want to re-create it? [y/N] " -n 1 -r
+        echo
+        if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
+            rm -rf "${IRONFOX_NPM_CACHE}" "${IRONFOX_NVM}" "${IRONFOX_ROOT}/node_modules"
+        fi
+    fi
+
+    download_and_extract 'nvm' "https://github.com/nvm-sh/nvm/archive/${NVM_COMMIT}.tar.gz" "${IRONFOX_NVM}" "${NVM_SHA512SUM}"
+
+    echo_red_text 'Installing Node.js...'
+    source "${IRONFOX_NVM_ENV}"
+    nvm install "${NODE_VERSION}"
+    nvm alias default "${NODE_VERSION}"
+    nvm use "${NODE_VERSION}"
+
+    echo_green_text "SUCCESS: Set-up Node.js environment at ${IRONFOX_NVM}"
+}
+
+# Get npm
+function get_npm() {
+    if  [ ! -d "${IRONFOX_NVM}" ]; then
+        echo_red_text "ERROR: You tried to download npm, but you don't have a Node.js environment set-up yet."
+        exit 1
+    fi
+
+    echo_red_text 'Installing npm...'
+    source "${IRONFOX_NVM_ENV}"
+    "${IRONFOX_NPM}" install -g npm@"${NPM_VERSION}"
+    echo_green_text "SUCCESS: Set-up npm at ${IRONFOX_NPM}"
 }
 
 # Get Phoenix
@@ -845,7 +877,7 @@ function get_pip() {
     fi
 
     echo_red_text 'Creating pip environment...'
-    python3.9 -m venv "${IRONFOX_PIP_DIR}"
+    "${IRONFOX_PYTHON}" -m venv "${IRONFOX_PIP_DIR}"
 
     echo_red_text 'Downloading pip...'
     download_and_extract 'pip' "https://github.com/pypa/pip/archive/${PIP_COMMIT}.tar.gz" "${IRONFOX_PIP}" "${PIP_SHA512SUM}"
@@ -927,6 +959,13 @@ function get_rust() {
     echo_green_text "SUCCESS: Set-up Rust environment at ${IRONFOX_CARGO_HOME}"
 }
 
+# Get UnifiedPush-AC
+function get_up_ac() {
+    echo_red_text 'Downloading UnifiedPush-AC...'
+    download_and_extract 'unifiedpush-ac' "https://gitlab.com/ironfox-oss/unifiedpush-ac/-/archive/${UNIFIEDPUSHAC_COMMIT}/unifiedpush-ac-${UNIFIEDPUSHAC_COMMIT}.tar.gz" "${IRONFOX_UP_AC}" "${UNIFIEDPUSHAC_SHA512SUM}"
+    echo_green_text "SUCCESS: Set-up UnifiedPush-AC at ${IRONFOX_UP_AC}"
+}
+
 if [ "${IRONFOX_GET_SOURCE_ANDROID_NDK}" == 1 ]; then
     get_android_ndk
 fi
@@ -1003,6 +1042,14 @@ fi
 
 if [ "${IRONFOX_GET_SOURCE_MICROG}" == 1 ]; then
     get_microg
+fi
+
+if [ "${IRONFOX_GET_SOURCE_NODE}" == 1 ]; then
+    get_node
+fi
+
+if [ "${IRONFOX_GET_SOURCE_NPM}" == 1 ]; then
+    get_npm
 fi
 
 if [ "${IRONFOX_GET_SOURCE_PHOENIX}" == 1 ]; then

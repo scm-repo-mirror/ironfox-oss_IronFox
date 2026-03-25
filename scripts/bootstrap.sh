@@ -58,6 +58,7 @@ if [[ "${IRONFOX_OS}" == 'osx' ]] || [[ "${IRONFOX_OS}" == 'secureblue' ]]; then
             gnu-tar \
             m4 \
             make \
+            python \
             temurin@17 \
             xz \
             zlib || error_fn
@@ -70,9 +71,7 @@ if [[ "${IRONFOX_OS}" == 'osx' ]] || [[ "${IRONFOX_OS}" == 'secureblue' ]]; then
         jq \
         nasm \
         ninja \
-        node \
         perl \
-        python@3.9 \
         yq || error_fn
     echo
 
@@ -144,7 +143,7 @@ elif [[ "${IRONFOX_OS}" == 'fedora' ]]; then
         ninja-build \
         patch \
         perl \
-        python3.9 \
+        python \
         shasum \
         temurin-8-jdk \
         temurin-17-jdk \
@@ -185,7 +184,7 @@ elif [[ "${IRONFOX_OS}" == 'ubuntu' ]]; then
         ninja-build \
         patch \
         perl \
-        python3.9 \
+        python \
         tar \
         temurin-8-jdk \
         temurin-17-jdk \

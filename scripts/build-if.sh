@@ -87,6 +87,7 @@ if [[ -n "${FDROID_BUILD+x}" ]]; then
 fi
 
 source "${IRONFOX_CARGO_ENV}"
+source "${IRONFOX_NVM_ENV}"
 source "${IRONFOX_PIP_ENV}"
 
 # Include version info
@@ -106,17 +107,21 @@ function set_build_env() {
         rm "${IRONFOX_ENV_BUILD}"
     fi
 
+    EPOCH_NS="$("${IRONFOX_DATE}" "+%s%N")"
+
     if [ "${IRONFOX_CI}" != 1 ] && [ "${IRONFOX_TARGET_ARCH}" == 'bundle' ]; then
         # Set build date for bundle builds, to avoid conflicts and ensure that MOZ_BUILDID is consistent across all builds
         ## (CI handles this at `env_ci.sh` instead)
         BUILD_DATE="$("${IRONFOX_DATE}" -u +"%Y-%m-%dT%H:%M:%SZ")"
         cat > "${IRONFOX_ENV_BUILD}" << EOF
 export IF_BUILD_DATE="${BUILD_DATE}"
+export IF_EPOCH_NS="${EPOCH_NS}"
 export IRONFOX_TARGET_ARCH="${IRONFOX_TARGET_ARCH}"
 EOF
     else
         echo "Writing ${IRONFOX_ENV_BUILD}..."
         cat > "${IRONFOX_ENV_BUILD}" << EOF
+export IF_EPOCH_NS="${EPOCH_NS}"
 export IRONFOX_TARGET_ARCH="${IRONFOX_TARGET_ARCH}"
 EOF
     fi
@@ -150,12 +155,6 @@ function prep_as() {
 function prep_fenix() {
     # Fenix
     echo_red_text 'Preparing Fenix...'
-
-    if [[ -f "${IRONFOX_FENIX}/local.properties" ]]; then
-        rm -f "${IRONFOX_FENIX}/local.properties"
-    fi
-    cp -f "${IRONFOX_PATCHES}/build/fenix/local.properties" "${IRONFOX_FENIX}/local.properties"
-    "${IRONFOX_SED}" -i "s|{IRONFOX_AS}|${IRONFOX_AS}|" "${IRONFOX_FENIX}/local.properties"
 
     # Configure ABI + release channel
     if [[ -f "${IRONFOX_FENIX}/app/build.gradle" ]]; then
@@ -222,15 +221,10 @@ function prep_gecko() {
     "${IRONFOX_SED}" -i "s|{IRONFOX_GLEAN}|${IRONFOX_GLEAN}|" "${IRONFOX_GECKO}/local.properties"
     "${IRONFOX_SED}" -i "s|{IRONFOX_GECKO}|${IRONFOX_GECKO}|" "${IRONFOX_GECKO}/local.properties"
 
-    # Ensure our cfg file doesn't already exist
-    if [[ -f "${IRONFOX_GECKO}/ironfox/prefs/ironfox.cfg" ]]; then
-        rm -f "${IRONFOX_GECKO}/ironfox/prefs/ironfox.cfg"
-    fi
-
-    # Ensure our policies file doesn't already exist
-    if [[ -f "${IRONFOX_GECKO}/ironfox/prefs/policies.json" ]]; then
-        rm -f "${IRONFOX_GECKO}/ironfox/prefs/policies.json"
-    fi
+    # Substitute our local version of Application Services (for Android Components)
+    "${IRONFOX_SED}" -i -e "s|val VERSION = .*|val VERSION = \"0.0.1-SNAPSHOT-"${IF_EPOCH_NS}-${APPSERVICES_VERSION}\""|g" "${IRONFOX_AC}/plugins/dependencies/src/main/java/ApplicationServices.kt"
+    "${IRONFOX_SED}" -i "s|{APPSERVICES_VERSION}|${APPSERVICES_VERSION}|" "${IRONFOX_GECKO}/local.properties"
+    "${IRONFOX_SED}" -i "s|{IF_EPOCH_NS}|${IF_EPOCH_NS}|" "${IRONFOX_GECKO}/local.properties"
 
     # Configure release channel
     if [[ "${IRONFOX_RELEASE}" == 1 ]]; then
@@ -276,6 +270,23 @@ function prep_glean() {
     echo_green_text 'SUCCESS: Prepared Glean'
 }
 
+function prep_phoenix() {
+    # Phoenix
+    echo_red_text 'Preparing Phoenix...'
+
+    # Ensure our cfg file doesn't already exist in mozilla-central
+    if [[ -f "${IRONFOX_GECKO}/ironfox/prefs/ironfox.cfg" ]]; then
+        rm -f "${IRONFOX_GECKO}/ironfox/prefs/ironfox.cfg"
+    fi
+
+    # Ensure our policies file doesn't already exist in mozilla-central
+    if [[ -f "${IRONFOX_GECKO}/ironfox/prefs/policies.json" ]]; then
+        rm -f "${IRONFOX_GECKO}/ironfox/prefs/policies.json"
+    fi
+
+    echo_green_text 'SUCCESS: Prepared Phoenix'
+}
+
 function prep_up_ac() {
     # unifiedpush-ac
     echo_red_text 'Preparing UnifiedPush-AC...'
@@ -285,7 +296,10 @@ function prep_up_ac() {
     fi
     cp -f "${IRONFOX_PATCHES}/build/unifiedpush-ac/local.properties" "${IRONFOX_UP_AC}/local.properties"
     "${IRONFOX_SED}" -i "s|{FIREFOX_VERSION}|${FIREFOX_VERSION}|" "${IRONFOX_UP_AC}/local.properties"
-    "${IRONFOX_SED}" -i "s|{IRONFOX_AS}|${IRONFOX_AS}|" "${IRONFOX_UP_AC}/local.properties"
+
+    # Substitute our local version of Application Services
+    "${IRONFOX_SED}" -i "s|{APPSERVICES_VERSION}|${APPSERVICES_VERSION}|" "${IRONFOX_UP_AC}/local.properties"
+    "${IRONFOX_SED}" -i "s|{IF_EPOCH_NS}|${IF_EPOCH_NS}|" "${IRONFOX_UP_AC}/local.properties"
 
     echo_green_text 'SUCCESS: Prepared UnifiedPush-AC'
 }
@@ -312,9 +326,12 @@ function build_bundletool() {
     # Bundletool
     echo_red_text 'Building Bundletool...'
 
-    pushd "${IRONFOX_BUNDLETOOL}"
+    pushd "${IRONFOX_BUNDLETOOL_DIR}"
+    clean_gradle
     "${IRONFOX_GRADLE}" assemble
     popd
+
+    cp -f "${IRONFOX_BUNDLETOOL_DIR}/build/libs/bundletool.jar" "${IRONFOX_BUNDLETOOL_JAR}"
 
     echo_green_text 'SUCCESS: Built Bundletool'
 }
@@ -403,10 +420,31 @@ function build_as() {
     unset CI
 
     bash -x "${IRONFOX_AS}/libs/verify-android-environment.sh"
-    "${IRONFOX_GRADLE}" ${IRONFOX_GRADLE_FLAGS} :tooling-nimbus-gradle:publishToMavenLocal
+
+    # Build Application Services
+    "${IRONFOX_GRADLE}" ${IRONFOX_GRADLE_FLAGS} publish -Plocal=${IF_EPOCH_NS}-${APPSERVICES_VERSION}
+
     popd
 
     echo_green_text 'SUCCESS: Built Application Services'
+}
+
+function build_nimbus_fml() {
+    # nimbus-fml
+    echo_red_text 'Building nimbus-fml...'
+
+    # Build nimbus-fml
+    pushd "${IRONFOX_AS}/components/support/nimbus-fml"
+    "${IRONFOX_CARGO}" build --release
+    popd
+
+    # Create symlink for mozilla-central
+    if [ -f "${IRONFOX_GECKO}/obj/ironfox-${IRONFOX_CHANNEL}-${IRONFOX_TARGET_ARCH}/dist/host/bin/nimbus-fml" ]; then
+        rm -f "${IRONFOX_GECKO}/obj/ironfox-${IRONFOX_CHANNEL}-${IRONFOX_TARGET_ARCH}/dist/host/bin/nimbus-fml"
+        ln -s "${IRONFOX_AS}/target/release/nimbus-fml" "${IRONFOX_GECKO}/obj/ironfox-${IRONFOX_CHANNEL}-${IRONFOX_TARGET_ARCH}/dist/host/bin/nimbus-fml"
+    fi
+
+    echo_green_text 'SUCCESS: Built nimbus-fml'
 }
 
 function build_gecko_ind() {
@@ -704,7 +742,8 @@ function build_up_ac() {
     # Always clean Gradle to ensure builds are fresh
     clean_gradle
 
-    "${IRONFOX_GRADLE}" ${IRONFOX_GRADLE_FLAGS} publishToMavenLocal
+    # Build UnifiedPush-AC
+    "${IRONFOX_GRADLE}" ${IRONFOX_GRADLE_FLAGS} publish
     popd
 
     echo_green_text 'SUCCESS: Built UnifiedPush-AC'
@@ -720,9 +759,8 @@ function build_ac_cont() {
 
     pushd "${IRONFOX_GECKO}"
     "${IRONFOX_MACH}" configure
-    # Enable the auto-publication workflow
-    echo "## Enable the auto-publication workflow for Application Services" >>"${IRONFOX_GECKO}/local.properties"
-    echo "autoPublish.application-services.dir=${IRONFOX_AS}" >>"${IRONFOX_GECKO}/local.properties"
+
+    # Build Android Components
     "${IRONFOX_MACH}" gradle -p mobile/android/android-components publishToMavenLocal
     unset IRONFOX_MACH_TARGET_AC
     export IRONFOX_MACH_TARGET_AC=0
@@ -753,7 +791,7 @@ function build_fenix() {
     # Always clean Gradle to ensure builds are fresh
     "${IRONFOX_MACH}" gradle fenix:clean
 
-    # Build our APKs
+    # Build Fenix
     "${IRONFOX_MACH}" gradle fenix:assembleRelease
 
     if [[ "${IRONFOX_TARGET_ARCH}" == 'bundle' ]]; then
@@ -815,6 +853,7 @@ set_build_env
 prep_as
 prep_gecko
 prep_gecko_prefs
+prep_phoenix
 prep_glean
 prep_llvm
 
@@ -836,23 +875,24 @@ echo_green_text 'SUCCESS: Prepared build environment'
 echo_red_text "Building IronFox ${IRONFOX_VERSION}: ${IRONFOX_CHANNEL_PRETTY} (${IRONFOX_TARGET_PRETTY})..."
 
 if [[ -n "${FDROID_BUILD+x}" ]]; then
-    build_bundletool
     build_llvm
 fi
 
 if [[ "${IRONFOX_NO_PREBUILDS}" == 1 ]]; then
+    build_bundletool
     build_prebuilds
 fi
 
 build_microg
 build_phoenix
 build_glean
-build_as
 build_gecko
 
 if [ "${IRONFOX_CI}" != 1 ] || [ "${IRONFOX_TARGET_ARCH}" == 'bundle' ]; then
     build_ac
+    build_as
     build_up_ac
+    build_nimbus_fml
     build_ac_cont
     build_fenix
     echo_green_text "SUCCESS: Built IronFox ${IRONFOX_VERSION}: ${IRONFOX_CHANNEL_PRETTY} (${IRONFOX_TARGET_PRETTY})"
