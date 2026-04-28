@@ -5,7 +5,13 @@
 
 set -euo pipefail
 
+# Ensure this is never ran with xtrace...
+set +x
+
 # Set-up our environment
+if [[ -z "${IRONFOX_CI+x}" ]]; then
+    export IRONFOX_CI=1
+fi
 if [[ -z "${IRONFOX_SET_ENVS+x}" ]]; then
     bash -x "$(realpath $(dirname "$0"))/env.sh"
 fi
@@ -16,6 +22,11 @@ source "${IRONFOX_UTILS}"
 
 if [[ -z "${IRONFOX_RELEASES_S3_ACCESS_KEY_FILE}" ]]; then
     echo_red_text 'ERROR: The IRONFOX_RELEASES_S3_ACCESS_KEY_FILE environment variable is missing! Aborting...'
+    exit 1
+fi
+
+if [ "${IRONFOX_RELEASES_S3_ACCESS_KEY_FILE}" == 'null' ]; then
+    echo_red_text 'ERROR: The IRONFOX_RELEASES_S3_ACCESS_KEY_FILE environment variable has not been specified! Aborting...'
     exit 1
 fi
 
@@ -36,6 +47,11 @@ if [[ -z "${IRONFOX_RELEASES_S3_BUCKET_NAME_FILE}" ]]; then
     exit 1
 fi
 
+if [ "${IRONFOX_RELEASES_S3_BUCKET_NAME_FILE}" == 'null' ]; then
+    echo_red_text 'ERROR: The IRONFOX_RELEASES_S3_BUCKET_NAME_FILE environment variable has not been specified! Aborting...'
+    exit 1
+fi
+
 if ! [[ -f "${IRONFOX_RELEASES_S3_BUCKET_NAME_FILE}" ]]; then
     echo_red_text "ERROR: S3 bucket name file not found! (${IRONFOX_RELEASES_S3_BUCKET_NAME_FILE})"
     echo_green_text "Please ensure the IRONFOX_RELEASES_S3_BUCKET_NAME_FILE environment variable is set to the correct path in which the bucket name file is located."
@@ -53,6 +69,11 @@ if [[ -z "${IRONFOX_RELEASES_S3_ENDPOINT_FILE}" ]]; then
     exit 1
 fi
 
+if [ "${IRONFOX_RELEASES_S3_ENDPOINT_FILE}" == 'null' ]; then
+    echo_red_text 'ERROR: The IRONFOX_RELEASES_S3_ENDPOINT_FILE environment variable has not been specified! Aborting...'
+    exit 1
+fi
+
 if ! [[ -f "${IRONFOX_RELEASES_S3_ENDPOINT_FILE}" ]]; then
     echo_red_text "ERROR: S3 endpoint file not found! (${IRONFOX_RELEASES_S3_ENDPOINT_FILE})"
     echo_green_text "Please ensure the IRONFOX_RELEASES_S3_ENDPOINT_FILE environment variable is set to the correct path in which the endpoint file is located."
@@ -62,6 +83,11 @@ fi
 
 if ! [[ -s "${IRONFOX_RELEASES_S3_ENDPOINT_FILE}" ]]; then
     echo_red_text "ERROR: S3 bucket name file ${IRONFOX_RELEASES_S3_ENDPOINT_FILE} is empty!"
+    exit 1
+fi
+
+if [ "${IRONFOX_RELEASES_S3_SECRET_KEY_FILE}" == 'null' ]; then
+    echo_red_text 'ERROR: The IRONFOX_RELEASES_S3_SECRET_KEY_FILE environment variable has not been specified! Aborting...'
     exit 1
 fi
 
@@ -155,13 +181,11 @@ for archive in "${IRONFOX_ARTIFACTS}"/*.tar.xz; do
     "${IRONFOX_TAR}" xvJf "${archive}" -C "${IRONFOX_ARTIFACTS}"
 done
 
-readonly BUILD_DIR="${CI_PROJECT_DIR}/build"
+mkdir -vp "${IRONFOX_BUILD}"
 
-mkdir -vp "${BUILD_DIR}"
-
-readonly RELEASE_NOTES_FILE="${BUILD_DIR}/release-notes.md"
-readonly CHECKSUMS_FILE="${BUILD_DIR}/asset-checksums.txt"
-readonly RELEASE_FILE="${BUILD_DIR}/release.yml"
+readonly RELEASE_NOTES_FILE="${IRONFOX_BUILD}/release-notes.md"
+readonly CHECKSUMS_FILE="${IRONFOX_BUILD}/asset-checksums.txt"
+readonly RELEASE_FILE="${IRONFOX_BUILD}/release.yml"
 
 echo -n "" > "${RELEASE_NOTES_FILE}"
 echo -n "" > "${CHECKSUMS_FILE}"
@@ -220,26 +244,46 @@ upload_apk_x86_64
 upload_apk_universal
 upload_apkset
 
+# Update our universal updates.json file
+## (ex. used by Obtainium)
+cp -f "${IRONFOX_TEMPLATES}/updates.json" "${IRONFOX_ROOT}/updates.json"
+
+readonly IRONFOX_ARM64_SHA512SUM=$(sha512sum "${IRONFOX_APK_ARTIFACTS}/ironfox-${IRONFOX_VERSION}-arm64-v8a.apk" | "${IRONFOX_AWK}" '{print $1}')
+readonly IRONFOX_ARM_SHA512SUM=$(sha512sum "${IRONFOX_APK_ARTIFACTS}/ironfox-${IRONFOX_VERSION}-armeabi-v7a.apk" | "${IRONFOX_AWK}" '{print $1}')
+readonly IRONFOX_X86_64_SHA512SUM=$(sha512sum "${IRONFOX_APK_ARTIFACTS}/ironfox-${IRONFOX_VERSION}-x86_64.apk" | "${IRONFOX_AWK}" '{print $1}')
+readonly IRONFOX_UNIVERSAL_SHA512SUM=$(sha512sum "${IRONFOX_APK_ARTIFACTS}/ironfox-${IRONFOX_VERSION}-universal.apk" | "${IRONFOX_AWK}" '{print $1}')
+readonly IRONFOX_BUNDLE_SHA512SUM=$(sha512sum "${IRONFOX_APKS_ARTIFACTS}/ironfox-${IRONFOX_VERSION}.apks" | "${IRONFOX_AWK}" '{print $1}')
+
+"${IRONFOX_SED}" -i "s|{IRONFOX_VERSION}|${IRONFOX_VERSION}|" "${IRONFOX_ROOT}/updates.json"
+"${IRONFOX_SED}" -i "s|ironfox-{IRONFOX_VERSION}|ironfox-${IRONFOX_VERSION}|" "${IRONFOX_ROOT}/updates.json"
+"${IRONFOX_SED}" -i "s|{IRONFOX_ARM64_SHA512SUM}|${IRONFOX_ARM64_SHA512SUM}|" "${IRONFOX_ROOT}/updates.json"
+"${IRONFOX_SED}" -i "s|{IRONFOX_ARM_SHA512SUM}|${IRONFOX_ARM_SHA512SUM}|" "${IRONFOX_ROOT}/updates.json"
+"${IRONFOX_SED}" -i "s|{IRONFOX_X86_64_SHA512SUM}|${IRONFOX_X86_64_SHA512SUM}|" "${IRONFOX_ROOT}/updates.json"
+"${IRONFOX_SED}" -i "s|{IRONFOX_UNIVERSAL_SHA512SUM}|${IRONFOX_UNIVERSAL_SHA512SUM}|" "${IRONFOX_ROOT}/updates.json"
+"${IRONFOX_SED}" -i "s|{IRONFOX_BUNDLE_SHA512SUM}|${IRONFOX_BUNDLE_SHA512SUM}|" "${IRONFOX_ROOT}/updates.json"
+
+upload_to_s3 "${IRONFOX_ROOT}/updates.json" 'ironfox/releases'
+
 # Because we now upload all releases to releases.ironfoxoss.org, we only want to keep the last 3 releases in ex. F-Droid
 ## In order to do so, we need to store/upload the current and prior 2 versions of IronFox as text files
-curl ${IRONFOX_CURL_FLAGS} -sSL 'https://releases.ironfoxoss.org/ironfox/releases/latest_release.txt' -o "${CI_PROJECT_DIR}/current-latest_release.txt"
-curl ${IRONFOX_CURL_FLAGS} -sSL 'https://releases.ironfoxoss.org/ironfox/releases/previous_release.txt' -o "${CI_PROJECT_DIR}/current-previous_release.txt"
+curl ${IRONFOX_CURL_FLAGS} -sSL 'https://releases.ironfoxoss.org/ironfox/releases/latest_release.txt' -o "${IRONFOX_ROOT}/current-latest_release.txt"
+curl ${IRONFOX_CURL_FLAGS} -sSL 'https://releases.ironfoxoss.org/ironfox/releases/previous_release.txt' -o "${IRONFOX_ROOT}/current-previous_release.txt"
 
-echo -n "${IRONFOX_VERSION}" > "${CI_PROJECT_DIR}/latest_release.txt"
-cp "${CI_PROJECT_DIR}/current-latest_release.txt" "${CI_PROJECT_DIR}/previous_release.txt"
-cp "${CI_PROJECT_DIR}/current-previous_release.txt" "${CI_PROJECT_DIR}/previous_previous_release.txt"
+echo -n "${IRONFOX_VERSION}" > "${IRONFOX_ROOT}/latest_release.txt"
+cp "${IRONFOX_ROOT}/current-latest_release.txt" "${IRONFOX_ROOT}/previous_release.txt"
+cp "${IRONFOX_ROOT}/current-previous_release.txt" "${IRONFOX_ROOT}/previous_previous_release.txt"
 
-upload_to_s3 "${CI_PROJECT_DIR}/latest_release.txt" 'ironfox/releases'
-add_sha512sum "${CI_PROJECT_DIR}/latest_release.txt" 'ironfox/releases'
+upload_to_s3 "${IRONFOX_ROOT}/latest_release.txt" 'ironfox/releases'
+add_sha512sum "${IRONFOX_ROOT}/latest_release.txt" 'ironfox/releases'
 
-upload_to_s3 "${CI_PROJECT_DIR}/previous_release.txt" 'ironfox/releases'
-add_sha512sum "${CI_PROJECT_DIR}/previous_release.txt" 'ironfox/releases'
+upload_to_s3 "${IRONFOX_ROOT}/previous_release.txt" 'ironfox/releases'
+add_sha512sum "${IRONFOX_ROOT}/previous_release.txt" 'ironfox/releases'
 
-upload_to_s3 "${CI_PROJECT_DIR}/previous_release.txt" 'ironfox/releases'
-add_sha512sum "${CI_PROJECT_DIR}/previous_previous_release.txt" 'ironfox/releases'
+upload_to_s3 "${IRONFOX_ROOT}/previous_release.txt" 'ironfox/releases'
+add_sha512sum "${IRONFOX_ROOT}/previous_previous_release.txt" 'ironfox/releases'
 
 {
-    readonly changelog_file="${CI_PROJECT_DIR}/changelogs/${IRONFOX_VERSION}.md"
+    readonly changelog_file="${IRONFOX_ROOT}/changelogs/${IRONFOX_VERSION}.md"
     if [[ -f "${changelog_file}" ]]; then
         cat "${changelog_file}"
     fi

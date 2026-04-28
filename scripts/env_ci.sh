@@ -5,10 +5,10 @@ unset TZ
 export TZ="UTC"
 
 # Android keystore/app signing
-export IRONFOX_KEYSTORE='/opt/IronFox/ironfox-keystore.jks'
-export IRONFOX_KEYSTORE_KEY_ALIAS='ironfox'
-export IRONFOX_KEYSTORE_KEY_PASS_FILE='/opt/IronFox/ironfox-signing-key.pass'
-export IRONFOX_KEYSTORE_PASS_FILE='/opt/IronFox/ironfox-keystore.pass'
+export IRONFOX_ANDROID_KEYSTORE='/opt/IronFox/ironfox-android-keystore.jks'
+export IRONFOX_ANDROID_KEYSTORE_KEY_ALIAS='ironfox'
+export IRONFOX_ANDROID_KEYSTORE_KEY_PASS_FILE='/opt/IronFox/ironfox-android-signing-key-pass.txt'
+export IRONFOX_ANDROID_KEYSTORE_PASS_FILE='/opt/IronFox/ironfox-android-keystore-pass.txt'
 
 # Build date
 export IRONFOX_DATE='date'
@@ -30,8 +30,14 @@ export IRONFOX_GECKOVIEW_BUNDLE_DIRECT=1
 # Log directory
 export IRONFOX_LOG_DIR="${IRONFOX_LOG_ARTIFACTS}"
 
+# S3
+export IRONFOX_RELEASES_S3_ACCESS_KEY_FILE='/opt/IronFox/ironfox-releases-s3-access-key.txt'
+export IRONFOX_RELEASES_S3_BUCKET_NAME_FILE='/opt/IronFox/ironfox-releases-s3-bucket-name.txt'
+export IRONFOX_RELEASES_S3_ENDPOINT_FILE='/opt/IronFox/ironfox-releases-s3-endpoint.txt'
+export IRONFOX_RELEASES_S3_SECRET_KEY_FILE='/opt/IronFox/ironfox-releases-s3-secret-key.txt'
+
 # Safe Browsing
-export IRONFOX_SB_GAPI_KEY_FILE='/opt/IronFox/ironfox-sb-gapi.data'
+export IRONFOX_SB_GAPI_KEY_FILE='/opt/IronFox/ironfox-sb-gapi-key.txt'
 
 # Skip the prompt to install IronFox via ADB after signing
 export IRONFOX_SIGN_SKIP_ADB=1

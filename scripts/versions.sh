@@ -3,10 +3,10 @@
 
 ## Firefox
 ### https://github.com/mozilla-firefox/firefox
-### (This commit corresponds to https://github.com/mozilla-firefox/firefox/releases/tag/FIREFOX-ANDROID_150_0_RELEASE)
-readonly FIREFOX_COMMIT='9154e5a11da43c93b65b436b0b12fd894bdc6f76'
-readonly FIREFOX_SHA512SUM='b3a325da83ea2088880f7b4bda5e4792d0d9fe5e90412106c3518eff8515b64fa2b7dd83f71c154ffa2be28be05057625589f22d44ace952c2d8d643574adcd8'
-readonly FIREFOX_VERSION='150.0'
+### (This commit corresponds to https://github.com/mozilla-firefox/firefox/releases/tag/FIREFOX-ANDROID_150_0_1_RELEASE)
+readonly FIREFOX_COMMIT='ec9aaac47d4c75159d041049a119cdf72f9d5a40'
+readonly FIREFOX_SHA512SUM='aecbc6f96b9d9d011e4c5e3cdaeb3eecf1811c4739f5c8a2209afbfacf29d1799900c8d19b81d020b692727ef7938ca104981d1f44ebb6824f0031cc2b5cfffa'
+readonly FIREFOX_VERSION='150.0.1'
 
 readonly IRONFOX_VERSION="${FIREFOX_VERSION}"
 
@@ -21,8 +21,8 @@ readonly APPSERVICES_VERSION='150.0.1'
 ### https://github.com/mozilla-l10n/firefox-l10n
 ### NOTE: This repo is updated several times a day...
 ### so I think best approach here will be for us to just update it alongside new releases
-readonly L10N_COMMIT='fa13341cbf4b532f1860ede5505805c07f923cc4'
-readonly L10N_SHA512SUM='71ca5d2482d4d5ac4ad471d7b2dbce58624864d13316e7f25a1f31d0ea4b93ab779dac14fc77472cda6f999d39a9b8a19c26b4e1a9eca2ab1fafbb22240d7a91'
+readonly L10N_COMMIT='e097b3c5ca4139a5b88052379a776782e078356b'
+readonly L10N_SHA512SUM='661cf7fb9600974e90624947e3a4268477973e96e61ec8c9a07e97f2d5bd369d68fd2978ea0de3cbdff8cbe8cf6512daffb27fd1df4fe2d90bbfff0aa2fc3271'
 
 ## Glean
 ### https://github.com/mozilla/glean
@@ -45,16 +45,16 @@ readonly GYP_COMMIT='91c8e14b561ed375dcdc3951e271c84f635eddb7'
 readonly GYP_SHA512SUM='87e54e9e8f6a585438f2f24105c342d7809e29780c972082684df05ffc65fd7815d9f72ecbbe9e71c7e81399be1d46a7306fd650e97b59f6e067bea7eaaa3e70'
 
 ## microG
-### Version: v0.3.14.250932
+### Version: v0.3.15.250932
 ### https://github.com/microg/GmsCore
-readonly GMSCORE_COMMIT='a5e0d9719a0f0e3a4a8dc032a6d67199ac497782'
-readonly GMSCORE_SHA512SUM='27d96a993574e0f4f5c67c59bfafefbc6701c3484a5097a604388843a3fcb5df0415867b52a48bff16e27e695f9fd8d7de25f2f1b19b8ce0c11bd12c364032ad'
+readonly GMSCORE_COMMIT='352f2d72fa52c6c3c4fdd79d575a071a0da72ad1'
+readonly GMSCORE_SHA512SUM='da38003f346cb7e86ce7bca89316e0c1d7c760b9312dd9505e63e0f6ef652563da102960e657cd37341d59d6ea00094a57837137d6835bafefe3c59d0839d4e9'
 
 ## Phoenix
 ### https://gitlab.com/celenityy/Phoenix
-readonly PHOENIX_COMMIT='9a7e49256837ce1928265734be1ea110c76b8aa4'
-readonly PHOENIX_SHA512SUM='4f89e53d23275a70621bad771047462195d668b9da3e5eda7191a09401681826416bd9a803e1b3dedfe70415d68d1bb7bde19c1396edae6f76847d11ecba4dbb'
-readonly PHOENIX_VERSION='2026.03.31.1'
+readonly PHOENIX_COMMIT='9ad10b5e54831a97a9c01cde09ea2351706d19dc'
+readonly PHOENIX_SHA512SUM='aaa70de11014e4e24e4787a6e9e000739c0266f30f3766f0ef86196e5f04b1e335921dff8d16b9ccce52f6f0c9c24f9b85d994dfd78f4aa20a31f279906933b7'
+readonly PHOENIX_VERSION='2026.04.27.1'
 
 ## uniffi-rs (Tor)
 ### https://gitlab.torproject.org/tpo/applications/uniffi-rs
@@ -71,6 +71,11 @@ readonly UNIFIEDPUSHAC_SHA512SUM='1a3fb43e137268db7bdd1b0d2bcd5149b795c63e4ab022
 readonly WASI_VERSION='20'
 
 # Tools
+
+## androguard
+### https://github.com/androguard/androguard
+readonly ANDROGUARD_COMMIT='dd458bead6165975c3ef0b1b78eaf2450e4889d9'
+readonly ANDROGUARD_SHA512SUM='b277363110c1984b43cb99b59685849551b7e5ec66c7a9783ea06ac4324d558094ee7e840695bada51d01fa690df34c0d02417001ddf087bec30adc205270166'
 
 ## Android NDK
 ### https://developer.android.com/ndk/downloads
@@ -168,8 +173,8 @@ readonly NODE_VERSION='25.8.1'
 
 ## npm
 ### https://github.com/npm/cli
-readonly NPM_SHA512SUM='cdca14b85d647b3192028d02aadbe82d75f79a446aceea9874be98e6d768f20ebd3555770a48d0e9906106007877bbc690f715e9372f2e2dc644a3c3157fb14c'
-readonly NPM_VERSION='11.12.1'
+readonly NPM_SHA512SUM='7119a16a0843580d65160977520e3f5710c974f04afd4fad36d9eb97d917ba716a856c35c78c4be6dc64367eeaccfb957ef5ce997ca31e9330b2e936ba2b1b92'
+readonly NPM_VERSION='11.13.0'
 
 ## nvm
 ### Version: v0.40.4
@@ -178,11 +183,11 @@ readonly NVM_COMMIT='62387b8f92aa012d48202747fd75c40850e5e261'
 readonly NVM_SHA512SUM='7b88477aa7400050cea6dda3cd197dad7d030fd951cd9aca945c04159fdb98ea3bbdda8a2b1c0761d1cd5d3893c669370b493727298f3b8440f97452fd229abc'
 
 ## pip
-### Version: 26.0.1
+### Version: 26.1
 ### https://github.com/pypa/pip
-### (This commit corresponds to https://github.com/pypa/pip/releases/tag/26.0.1)
-readonly PIP_COMMIT='5fe4ea4f24cd9756316a4b5ef05daa15d84f7d0c'
-readonly PIP_SHA512SUM='3fca339b7c2596581fcf9691b8ef43664b4d0b25494b30eebda803586134c160a06db128437c2fcce9708e26d6ef9450af2e5d9fe0e724d56f65cfb7dda45e7a'
+### (This commit corresponds to https://github.com/pypa/pip/releases/tag/26.1)
+readonly PIP_COMMIT='90b2b3e0f7ef75c485155716d904e51654575803'
+readonly PIP_SHA512SUM='50a16d209f26a6e25cdf1c3c187523871e01e0c23cf8d8cf497de9eefce9fc967e28f96a5ab786070d334767e7728cc1caa4969e20d8a9a3f06688cb4b94eeac'
 
 ## Python
 ### https://github.com/astral-sh/python-build-standalone
@@ -192,6 +197,11 @@ readonly PYTHON_SHA512SUM_LINUX_X86_64='38bcec7bda37073ecdd92fccaf21353fd4d774c6
 readonly PYTHON_SHA512SUM_OSX_ARM64='e21f71ca3f7365f8fd962ea9df4fb693fddab04e11f34e4d0b4e15ec7eb0d9e44678abb4a6ae4a6c2e558035aa6fedd5399931b30c07fde0630d369d64dac514'
 readonly PYTHON_SHA512SUM_OSX_X86_64='ff82685a0f15d7d987c239b72b8d8148d476bbe82f3ef38a7a04541e4ef4f883c42349fa27b66de4f93e21d47cdb85660b8eedd6b257a13617d919a9462295ab'
 readonly PYTHON_VERSION='3.14.4'
+
+## PyYAML
+### https://github.com/yaml/pyyaml
+readonly PYYAML_COMMIT='49790e73684bebad1df05ef8d828fa12f685bffb'
+readonly PYYAML_SHA512SUM='2fd1334af2722c093592f93a5eee01d0b2e26976a12cb2e4859b4271a8fa47ff257d10c91b09bdb2b5aa9415b62693a69d6e6602e997c2bff6711aa02bf43937'
 
 ## Rust
 ### https://releases.rs/
@@ -213,11 +223,11 @@ readonly S3CMD_SHA512SUM='b1b7c792265dfa1ccdd40f816e3463617c168e4317acac930b251c
 
 ## uv
 ### https://github.com/astral-sh/uv
-readonly UV_SHA512SUM_LINUX_ARM64='b55ff69f987833d3a0cfbff6508321c1af58f9b0c320ed32f0f34bdafcf4d1c1d23d1bd6c9a9178fb06a883ad09fe0e8c06d1a187a009c3150d3bf277023c89c'
-readonly UV_SHA512SUM_LINUX_X86_64='df988a2b974fe317444da1008df954c382c0ad1f2cba9995106ba8ae4d2f8f2034fe66b46032f52b36a4b820e51eea7552b5c3600d9f70a622dba1e001c7bf15'
-readonly UV_SHA512SUM_OSX_ARM64='79c964bfb4f70d6058b6169d47250c60a0dc17919b18480f9620b6aed6464847759b89a442a46ecddd1978df7ef975218121655acdbbf5c122f48ea1ed4701b0'
-readonly UV_SHA512SUM_OSX_X86_64='105a6f52b06870eabee40bdc3e28743013da30c2e4898642376d777f1e11f54267806b20695fb5d42279cf7ab4995925ca19c8b3345d69b581f090527e48e480'
-readonly UV_VERSION='0.11.7'
+readonly UV_SHA512SUM_LINUX_ARM64='fc5fff4939efc20e01362be3e27102ef20e2a6f646723336d6ad25c2fa08214400a19f5f40f251ae41d64bce97a9247b33da867f7712b7a14da478fbe31e5865'
+readonly UV_SHA512SUM_LINUX_X86_64='2a5d8a00a86cc62be31efbc3d29ec4639927b77805e17c704fe9e7aa5a4ed5584000cd2c3da03c593811f79820a181c3f17c70c2996983ed69b3a51d85cf6017'
+readonly UV_SHA512SUM_OSX_ARM64='f846e7cd9d0647be54626111057d379efd6d97adc04b6f038e6635190784290ee24b81aa461237b3b95afb2a55bd3ed823cdfcbcfc9cfa7b14bf97d15f73e86e'
+readonly UV_SHA512SUM_OSX_X86_64='e263206132d268643cd1592e655c2316b505f17edac01f66236841f5863b755b0ab8292e32652d6cf3805672bdb79deedd1bff7d41adaa368666759461db57be'
+readonly UV_VERSION='0.11.8'
 
 # For prebuilds
 ## https://gitlab.com/ironfox-oss/prebuilds

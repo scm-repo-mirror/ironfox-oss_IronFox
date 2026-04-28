@@ -46,7 +46,7 @@ fi
 
 readonly target="$1"
 
-# Set up target parameters
+# Set-up target parameters
 IRONFOX_PREPARE_AC=0
 IRONFOX_PREPARE_ANDROID_SDK=0
 IRONFOX_PREPARE_AS=0
