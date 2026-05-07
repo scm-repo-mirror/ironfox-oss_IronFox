@@ -93,9 +93,16 @@ patches:
     effect: "Reduces build-time, and reduces the complexity of the overall build process."
     category: "Build System"
 
+  - file: "gecko-support-native-manifests.patch"
+    name: "Support Native Manifests"
+    description: "Adds support for native manifests to GeckoView."
+    reason: "Adds support for native manifests to GeckoView, in order to configure/harden uBlock Origin."
+    effect: "Users are provided with a strengthened/enhanced config for uBlock Origin out of the box."
+    category: "Build System"
+
   - file: "gecko-support-policies.patch"
     name: "Support Enterprise Policies"
-    description: "Adds support for, and configures a set of, enterprise policies for GeckoView."
+    description: "Adds support for enterprise policies to GeckoView."
     reason: "Allows for additional control/configuration of the browsing behavior."
     effect: "Allows users to take advantage of additional customizations, and helps to provide a superior browsing experience."
     category: "Build System"
@@ -105,6 +112,13 @@ patches:
     description: "Adds support for Firefox's AutoConfig functionality to GeckoView, and leverages it for advanced configuration."
     reason: "Allows for additional control/configuration of the browsing behavior."
     effect: "Allows users to take advantage of additional customizations, and helps to provide a superior browsing experience."
+    category: "Build System"
+
+  - file: "gecko-autoconfig-setenv.patch"
+    name: "Support setting environment variables via AutoConfig"
+    description: "Adds support for setting environment variables with Firefox's AutoConfig functionality."
+    reason: "Allows for advanced configuration of browsing behavior."
+    effect: "Provides more control and allows for more advanced browser configuration."
     category: "Build System"
 
   - file: "gecko-substitute-nimbus-fml.patch"
@@ -148,13 +162,6 @@ patches:
     description: "Prioritizes the use of Android's standard Credential Manager API, instead of first attempting to use microG/Google Play Services (if they're installed by the user)."
     reason: "Avoids unnecessary/unwanted use of Google Play Services."
     effect: "Improves privacy and freedom for users, by avoiding the use of Google Play Services."
-    category: "Dependency"
-
-  - file: "gecko-remove-gmp-sources.patch"
-    name: "Remove GMP (Gecko Media Plugins) Sources"
-    description: "Removes Firefox's default sources for installing Gecko Media Plugins (GMP: https://wiki.mozilla.org/GeckoMediaPlugins), such as OpenH264 and Widevine (the latter is proprietary)."
-    reason: "To prevent the installation of unwanted/unnecessary plug-ins."
-    effect: "Improves security for users, by reducing attack surface, and protects freedom, by ensuring that proprietary plug-ins are not installed."
     category: "Dependency"
 
   # Mozilla
@@ -408,23 +415,19 @@ patches:
     name: "Add DNS over HTTPS Providers"
     description: |
       Adds the following DoH providers to the browser's built-in list:
-        - Quad9
-        - AdGuard
-        - AdGuard (Unfiltered)
+        - Mullvad (Base)
         - Cloudflare (Malware Protection)
         - DNS4EU (Ad Blocking)
         - DNS4EU (Protective)
         - DNS4EU (Unfiltered)
-        - Mullvad (Base)
         - Mullvad (Unfiltered)
-        - Wikimedia
     reason: "To add support for multiple secure DNS providers in the UI settings."
     effect: "Adds a selection of carefully selected DoH providers for the users to choose from."
     category: "Privacy"
 
-  - file: "fenix-enable-doh-via-quad9-by-default.patch"
-    name: "Enable DNS over HTTPS (via Quad9) by default"
-    description: "Enables DNS over HTTPS without fallback by default, and sets Quad9 as the default provider."
+  - file: "fenix-enable-doh-via-mullvad-base-by-default.patch"
+    name: "Enable DNS over HTTPS (via Mullvad (Base)) by default"
+    description: "Enables DNS over HTTPS without fallback by default, and sets Mullvad (Base) as the default provider."
     reason: "To harden DoH out of the box."
     effect: "Improves DNS privacy and security by strengthening DoH's default protection level."
     category: "Privacy"
@@ -538,14 +541,25 @@ patches:
     effect: "Users are protected against tracking, and benefit from added attack surface reduction, without causing breakage and having to deal with the usual side effects that appear when the Beacon API is disabled."
     category: "Privacy"
 
-  - file: "gecko-prevent-exposing-branding.patch"
-    name: "Prevent exposing branding resources to websites"
+  - file: "gecko-prevent-fingerprinting-via-chrome-resources.patch"
+    name: "Prevent fingerprinting via the browser's internal resources"
     description: |
       Prevents exposing branding assets and certain other internal resources to websites
       (https://gitlab.torproject.org/tpo/applications/tor-browser/-/commit/ecb798d066b039329223b4c31133e2f917ca477d).
+      Also adds the resources for `about:crashes` in order to match Firefox.
     reason: | 
       Improves privacy by preventing websites from determining whether a user is on IronFox,
-      and improves compatibility, as we have reason to believe websites might be using this to block LibreWolf/IronFox users.
+      and improves compatibility, as we have reason to believe websites might be using this to block users of derivatives (ex. IronFox and LibreWolf).
+    effect: "Users are protected against additional fingerprinting vectors, and websites work as expected."
+    category: "Privacy"
+
+  - file: "gecko-prevent-fingerprinting-via-crash-resources.patch"
+    name: "Prevent fingerprinting via the presence of resources used by `about:crashes`"
+    description: |
+      Adds the resources for `about:crashes` in order to match Firefox.
+    reason: | 
+      Improves privacy by preventing websites from determining whether a user is on IronFox,
+      and improves compatibility, as we have reason to believe websites might be using this to block users of derivatives (ex. IronFox and LibreWolf).
     effect: "Users are protected against additional fingerprinting vectors, and websites work as expected."
     category: "Privacy"
 
@@ -641,6 +655,15 @@ patches:
     category: "Security"
 
   # User Control
+  - file: "gecko-devtools-bypass.patch"
+    name: "Bypass DevTools detection"
+    description: "Prevents websites from detecting that a user is using developer tools/debugging."
+    reason: |
+      To allow users to use developer tools/debugging if desired, without leading to undesired behavior from websites.
+      (See https://codeberg.org/librewolf/source/pulls/61 for more details).
+    effect: "Users are provided with more control over their browsing experience, and can freely use developer tools/debugging if they decide to."
+    category: "User Control"
+
   - file: "gecko-enable-aboutinference.patch"
     name: "Enable `about:inference`"
     description: "Enables the `about:inference` page."
@@ -655,13 +678,6 @@ patches:
     effect: "Users are provided with more control over their browsing experience, and can further improve their security if desired."
     category: "User Control"
 
-  - file: "fenix-display-extensions-in-custom-tabs-menu-by-default.patch"
-    name: "Display extensions in the custom tabs menu by default"
-    description: "Displays the status of extensions in the menu for custom tabs."
-    reason: "To improve freedom/control for users, by allowing them to see the status of extensions at any time, even when running with a custom tab."
-    effect: "Users are provided with more control over their browsing experience."
-    category: "User Interface"
-
   # User Experience
   - file: "fenix-default-site-permissions.patch"
     name: "Default Site Permissions"
@@ -669,6 +685,13 @@ patches:
     reason: "To prevent websites from prompting users to access Geolocation and send Notifications, and to prevent unwanted audio/video playback."
     effect: "Improves user experience, and blocking Autoplay reduces bandwidth usage."
     category: "User Experience"
+
+  - file: "fenix-display-extensions-in-custom-tabs-menu-by-default.patch"
+    name: "Display extensions in the custom tabs menu by default"
+    description: "Displays the status of extensions in the menu for custom tabs."
+    reason: "To improve freedom/control for users, by allowing them to see the status of extensions at any time, even when running with a custom tab."
+    effect: "Users are provided with more control over their browsing experience."
+    category: "User Interface"
 
   - file: "fenix-enable-custom-download-location.patch"
     name: "Enable Custom Download Location"

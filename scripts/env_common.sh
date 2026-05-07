@@ -857,7 +857,7 @@ readonly IRONFOX_CURL_FLAGS_OVERRIDE
 export IRONFOX_CURL_FLAGS_OVERRIDE
 
 # curl flags
-readonly IRONFOX_CURL_FLAGS_DEFAULT="-q --disable --no-netrc -j -e "" -A "" -S --ciphers ${IRONFOX_CIPHERS} --clobber --create-dirs --delegation none --disallow-username-in-url --doh-cert-status --ftp-create-dirs --ftp-ssl-control --junk-session-cookies --no-basic --no-ca-native --no-digest --no-doh-insecure --no-http0.9 --no-insecure --no-proxy-insecure --no-negotiate --no-ntlm --no-proxy-basic --no-proxy-ca-native --no-proxy-digest --no-proxy-insecure --no-proxy-ntlm --no-proxy-ssl-allow-beast --no-proxy-ssl-auto-client-cert --no-sessionid --no-skip-existing --no-ssl --no-ssl-allow-beast --no-ssl-auto-client-cert --no-ssl-no-revoke --no-ssl-revoke-best-effort --no-tls-earlydata --no-xattr --progress-meter --proto -all,https --proto-default https --proto-redir -all,https --referer "" --remove-on-error --show-error --ssl-reqd --tlsv1.2 --trace-time --user-agent "" --verbose"
+readonly IRONFOX_CURL_FLAGS_DEFAULT="-q --disable --no-netrc -j -e "" -A "" -S --ciphers ${IRONFOX_CIPHERS} --clobber --create-dirs --delegation none --disallow-username-in-url --doh-cert-status --ftp-create-dirs --ftp-ssl-control --junk-session-cookies --no-basic --no-ca-native --no-digest --no-doh-insecure --no-http0.9 --no-insecure --no-proxy-insecure --no-negotiate --no-ntlm --no-proxy-basic --no-proxy-ca-native --no-proxy-digest --no-proxy-insecure --no-proxy-ssl-allow-beast --no-proxy-ssl-auto-client-cert --no-sessionid --no-skip-existing --no-ssl --no-ssl-allow-beast --no-ssl-auto-client-cert --no-ssl-no-revoke --no-ssl-revoke-best-effort --no-tls-earlydata --no-xattr --progress-meter --proto -all,https --proto-default https --proto-redir -all,https --referer "" --remove-on-error --show-error --ssl-reqd --tlsv1.2 --trace-time --user-agent "" --verbose"
 if [[ -z "${IRONFOX_CURL_FLAGS+x}" ]]; then
     IRONFOX_CURL_FLAGS="${IRONFOX_CURL_FLAGS_DEFAULT}"
 elif [[ "${IRONFOX_CURL_FLAGS_OVERRIDE}" == 1 ]]; then
@@ -963,7 +963,7 @@ readonly IRONFOX_S3CMD_FLAGS_OVERRIDE
 export IRONFOX_S3CMD_FLAGS_OVERRIDE
 
 # s3cmd flags
-readonly IRONFOX_S3CMD_FLAGS_DEFAULT='--check-certificate --check-hostname --check-md5 --progress --ssl'
+readonly IRONFOX_S3CMD_FLAGS_DEFAULT='--check-certificate --check-hostname --check-md5 --no-guess-mime-type --no-mime-magic --progress --ssl'
 if [[ -z "${IRONFOX_S3CMD_FLAGS+x}" ]]; then
     IRONFOX_S3CMD_FLAGS="${IRONFOX_S3CMD_FLAGS_DEFAULT}"
 elif [[ "${IRONFOX_S3CMD_FLAGS_OVERRIDE}" == 1 ]]; then

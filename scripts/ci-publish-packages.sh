@@ -134,6 +134,26 @@ function upload_to_s3() {
         exit 1
     fi
 
+    # Set our MIME type
+    case "${upload_file}" in
+        *.apk)
+            local readonly mime_type='application/vnd.android.package-archive'
+            ;;
+        *.apks)
+            local readonly mime_type='application/vnd.android.package-archive'
+            ;;
+        *.json)
+            local readonly mime_type='application/json'
+            ;;
+        *.txt)
+            local readonly mime_type='text/plain'
+            ;;
+        *)
+            echo_red_text "ERROR: Unsupported file type: ${upload_file}"
+            exit 1
+            ;;
+    esac
+
     local readonly s3_access_key=$(cat "${IRONFOX_RELEASES_S3_ACCESS_KEY_FILE}" | xargs)
     local readonly s3_bucket_name=$(cat "${IRONFOX_RELEASES_S3_BUCKET_NAME_FILE}" | xargs)
     local readonly s3_endpoint=$(cat "${IRONFOX_RELEASES_S3_ENDPOINT_FILE}" | xargs)
@@ -141,7 +161,7 @@ function upload_to_s3() {
 
     echo_red_text "Uploading ${upload_file} to S3..."
     source "${IRONFOX_PYENV}"
-    "${IRONFOX_S3CMD}" ${IRONFOX_S3CMD_FLAGS} put "${upload_file}" "s3://${s3_bucket_name}/${s3_full_path}" \
+    "${IRONFOX_S3CMD}" ${IRONFOX_S3CMD_FLAGS} --mime-type="${mime_type}" put "${upload_file}" "s3://${s3_bucket_name}/${s3_full_path}" \
       --access_key="${s3_access_key}" \
       --secret_key="${s3_secret_key}" \
       --host="${s3_endpoint}" \
